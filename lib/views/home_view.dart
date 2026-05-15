@@ -66,7 +66,14 @@ class HomeView extends GetView<MedicineController> {
 
         return RefreshIndicator(
           onRefresh: controller.loadMedicines,
-          child: ListView.builder(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+            ),
             itemCount: controller.medicines.length,
             itemBuilder: (context, index) {
               final medicine = controller.medicines[index];

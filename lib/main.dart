@@ -6,7 +6,7 @@ import 'services/ocr_service.dart';
 import 'services/ai_service.dart';
 import 'controllers/medicine_controller.dart';
 import 'controllers/inventory_controller.dart';
-import 'views/home_view.dart';
+import 'views/main_wrapper.dart';
 import 'core/theme.dart';
 
 void main() async {
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       title: 'Bershama Pharmacy',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.pharmacyTheme,
-      home: const HomeView(),
+      home: const MainWrapper(),
     );
   }
 }

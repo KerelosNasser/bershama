@@ -59,7 +59,7 @@ class AiHelpView extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(vertical: 4),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isUser ? AppTheme.primaryGreen : Colors.grey[200],
+                      color: isUser ? AppTheme.primaryBlue : Colors.grey[200],
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -93,7 +93,7 @@ class AiHelpView extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send, color: AppTheme.primaryGreen),
+                  icon: const Icon(Icons.send, color: AppTheme.primaryBlue),
                   onPressed: controller.sendMessage,
                 ),
               ],

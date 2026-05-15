@@ -14,7 +14,7 @@ class AiService extends GetxService {
   Future<String> getMedicalAdvice(String symptoms) async {
     try {
       final response = await _dio.post('/chat/completions', data: {
-        'model': 'google/gemini-2.0-flash-001',
+        'model': 'deepseek/deepseek-v4-flash:free',
         'messages': [
           {
             'role': 'system',

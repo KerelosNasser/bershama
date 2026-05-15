@@ -137,7 +137,7 @@ class OcrScannerView extends StatelessWidget {
                           ElevatedButton.icon(
                             onPressed: controller.useRecognizedText,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.primaryGreen,
+                              backgroundColor: AppTheme.primaryBlue,
                               foregroundColor: Colors.white,
                             ),
                             icon: const Icon(Icons.check),
