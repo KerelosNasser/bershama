@@ -27,14 +27,16 @@ class InventoryController extends GetxController {
         timestamp: DateTime.now(),
       );
 
-      // 3. Update DB
-      await _dbService.saveMedicine(updatedMedicine);
+      // 3. Update DB and UI State
+      await _medicineController.updateMedicine(updatedMedicine);
       await _dbService.addSale(sale);
 
-      // 4. Refresh medicine list
-      await _medicineController.loadMedicines();
-      
-      Get.snackbar('Success', 'Sold $quantity units of ${medicine.name}');
+      Get.snackbar(
+        'Success', 
+        'Sold $quantity units of ${medicine.name}',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
       return true;
     } catch (e) {
       Get.snackbar('Error', 'Failed to process sale: $e');

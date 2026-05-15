@@ -136,7 +136,11 @@ class MedicineController extends GetxController {
 
   Future<void> updateMedicine(MedicineModel medicine) async {
     await _dbService.saveMedicine(medicine);
-    _refreshList();
+    final index = medicines.indexWhere((m) => m.id == medicine.id);
+    if (index != -1) {
+      medicines[index] = medicine;
+      medicines.refresh(); // Trigger Obx listeners for list elements
+    }
   }
 
   Future<void> deleteMedicine(String id) async {
