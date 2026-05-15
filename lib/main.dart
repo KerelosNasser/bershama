@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'services/db_service.dart';
+import 'services/ocr_service.dart';
+import 'services/ai_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Services
+  await Get.putAsync(() => DbService().init());
+  Get.put(OcrService());
+  Get.put(AiService());
+
   runApp(const MyApp());
 }
 
