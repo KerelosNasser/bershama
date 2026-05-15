@@ -37,6 +37,26 @@ class MedicineModel extends HiveObject {
     required this.imageUrl,
   });
 
+  MedicineModel copyWith({
+    String? id,
+    String? name,
+    List<String>? chemicals,
+    String? description,
+    String? dosage,
+    int? currentStock,
+    String? imageUrl,
+  }) {
+    return MedicineModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      chemicals: chemicals ?? this.chemicals,
+      description: description ?? this.description,
+      dosage: dosage ?? this.dosage,
+      currentStock: currentStock ?? this.currentStock,
+      imageUrl: imageUrl ?? this.imageUrl,
+    );
+  }
+
   factory MedicineModel.fromJson(Map<String, dynamic> json) =>
       _$MedicineModelFromJson(json);
 
