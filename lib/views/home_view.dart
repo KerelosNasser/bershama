@@ -14,18 +14,17 @@ class HomeView extends GetView<MedicineController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bershama Pharmacy'),
+        title: const Text(
+          'Bershama Pharmacy',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+        ),
         actions: [
-          IconButton(
-            icon: const HeroIcon(HeroIcons.cpuChip),
-            onPressed: () => Get.to(() => const AiHelpView()),
-            tooltip: 'AI Help',
-          ),
           IconButton(
             icon: const HeroIcon(HeroIcons.camera),
             onPressed: () => Get.to(() => const OcrScannerView()),
             tooltip: 'OCR Scanner',
           ),
+          const SizedBox(width: 8),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 import '../../models/medicine_model.dart';
 
 class MedicineTile extends StatelessWidget {
@@ -13,30 +15,75 @@ class MedicineTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Hero(
-                tag: 'medicine_${medicine.id}',
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
+              child: Stack(
+                children: [
+                  Hero(
+                    tag: 'medicine_${medicine.id}',
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                        child: medicine.imageUrl.isNotEmpty
+                            ? Image.network(
+                                medicine.imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => 
+                                    const Center(child: HeroIcon(HeroIcons.beaker, size: 40, color: Colors.blue)),
+                              )
+                            : const Center(child: HeroIcon(HeroIcons.beaker, size: 40, color: Colors.blue)),
+                      ),
+                    ),
                   ),
-                  child: medicine.imageUrl.isNotEmpty
-                      ? Image.network(
-                          medicine.imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => 
-                              const Icon(Icons.medication, size: 50, color: Colors.blue),
-                        )
-                      : const Icon(Icons.medication, size: 50, color: Colors.blue),
-                ),
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.inventory_2, size: 12, color: medicine.currentStock > 10 ? Colors.blue : Colors.red),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${medicine.currentStock}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: medicine.currentStock > 10 ? Colors.blue : Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
@@ -47,37 +94,23 @@ class MedicineTile extends StatelessWidget {
                   Text(
                     medicine.name,
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: Color(0xFF1A237E),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     medicine.chemicals.join(', '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.inventory_2,
-                        size: 14,
-                        color: medicine.currentStock > 10 ? Colors.blue : Colors.red,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${medicine.currentStock}',
-                        style: TextStyle(
-                          color: medicine.currentStock > 10 ? Colors.blue : Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey[600],
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ],
               ),
