@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/medicine_model.dart';
 import '../services/db_service.dart';
 
 class MedicineController extends GetxController {
   final DbService _dbService = Get.find<DbService>();
+  final searchController = TextEditingController();
 
   var medicines = <MedicineModel>[].obs;
   var isLoading = false.obs;
@@ -12,6 +14,12 @@ class MedicineController extends GetxController {
   void onInit() {
     super.onInit();
     loadMedicines();
+  }
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
   }
 
   Future<void> loadMedicines() async {

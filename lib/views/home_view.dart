@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 import '../controllers/medicine_controller.dart';
 import 'widgets/medicine_tile.dart';
 import 'medicine_detail_view.dart';
+import 'ai_help_view.dart';
+import 'ocr_scanner_view.dart';
 
 class HomeView extends GetView<MedicineController> {
   const HomeView({super.key});
@@ -12,15 +15,35 @@ class HomeView extends GetView<MedicineController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bershama Pharmacy'),
+        actions: [
+          IconButton(
+            icon: const HeroIcon(HeroIcons.cpuChip),
+            onPressed: () => Get.to(() => const AiHelpView()),
+            tooltip: 'AI Help',
+          ),
+          IconButton(
+            icon: const HeroIcon(HeroIcons.camera),
+            onPressed: () => Get.to(() => const OcrScannerView()),
+            tooltip: 'OCR Scanner',
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              controller: controller.searchController,
               onChanged: controller.searchMedicines,
               decoration: InputDecoration(
                 hintText: 'Search medicines or chemicals...',
                 prefixIcon: const Icon(Icons.search),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    controller.searchController.clear();
+                    controller.searchMedicines('');
+                  },
+                ),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
