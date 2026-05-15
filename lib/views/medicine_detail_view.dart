@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../models/medicine_model.dart';
 import '../controllers/inventory_controller.dart';
 import '../controllers/medicine_controller.dart';
+import '../core/theme.dart';
 
 class MedicineDetailView extends StatefulWidget {
   final MedicineModel medicine;
@@ -35,122 +38,264 @@ class _MedicineDetailViewState extends State<MedicineDetailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            expandedHeight: 250,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                _currentMedicine.name,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          _buildSliverAppBar(),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildQuickStats(),
+                  const SizedBox(height: 32),
+                  _buildInfoSection(
+                    'Clinical Mechanism',
+                    _currentMedicine.description,
+                    HeroIcons.beaker,
+                    Colors.blue,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildInfoSection(
+                    'Recommended Dosage',
+                    _currentMedicine.dosage,
+                    HeroIcons.clock,
+                    Colors.indigo,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildChemicalsSection(),
+                  const SizedBox(height: 20),
+                  _buildProfessionalNotes(),
+                  const SizedBox(height: 100),
+                ],
               ),
-              background: Hero(
-                tag: 'medicine_${_currentMedicine.id}',
+            ),
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: FloatingActionButton.extended(
+            onPressed: _currentMedicine.currentStock > 0 ? () => _showSellDialog(context) : null,
+            backgroundColor: _currentMedicine.currentStock > 0 ? AppTheme.primaryBlue : Colors.grey,
+            elevation: 4,
+            label: const Text(
+              'ISSUE MEDICATION',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.1),
+            ),
+            icon: const HeroIcon(HeroIcons.shoppingCart, size: 20),
+          ),
+        ),
+      ).animate().fadeIn(delay: 400.ms).slideY(begin: 1),
+    );
+  }
+
+  Widget _buildSliverAppBar() {
+    return SliverAppBar(
+      expandedHeight: 300,
+      pinned: true,
+      backgroundColor: AppTheme.primaryBlue,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            Hero(
+              tag: 'medicine_${_currentMedicine.id}',
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue[100],
+                ),
                 child: _currentMedicine.imageUrl.isNotEmpty
                     ? Image.network(
                         _currentMedicine.imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Icon(Icons.medication, size: 100, color: Colors.white),
+                          child: HeroIcon(HeroIcons.beaker, size: 80, color: AppTheme.primaryBlue),
                         ),
                       )
-                    : Container(
-                        color: Theme.of(context).primaryColor,
-                        child: const Icon(Icons.medication, size: 100, color: Colors.white),
-                      ),
+                    : const Center(child: HeroIcon(HeroIcons.beaker, size: 80, color: AppTheme.primaryBlue)),
               ),
             ),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSectionTitle('Chemicals'),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: _currentMedicine.chemicals
-                          .map((c) => Chip(
-                                label: Text(c),
-                                backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                              ))
-                          .toList(),
-                    ),
-                    const Divider(height: 32),
-                    _buildSectionTitle('Dosage'),
-                    const SizedBox(height: 8),
-                    Text(_currentMedicine.dosage, style: Theme.of(context).textTheme.bodyLarge),
-                    const Divider(height: 32),
-                    _buildSectionTitle('Description'),
-                    const SizedBox(height: 8),
-                    Text(_currentMedicine.description, style: Theme.of(context).textTheme.bodyLarge),
-                    const Divider(height: 32),
-                    _buildStockSection(context),
-                    const SizedBox(height: 80), // Space for button
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.7),
                   ],
                 ),
               ),
-            ]),
-          ),
-        ],
-      ),
-      bottomSheet: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              offset: const Offset(0, -4),
-              blurRadius: 10,
+            ),
+            Positioned(
+              bottom: 20,
+              left: 20,
+              right: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _currentMedicine.name.toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'PHARMACEUTICAL GRADE PRODUCT',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        child: ElevatedButton(
-          onPressed: _currentMedicine.currentStock > 0 ? () => _showSellDialog(context) : null,
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 50),
-            backgroundColor: Theme.of(context).primaryColor,
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('SELL MEDICINE', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  Widget _buildQuickStats() {
+    return Row(
+      children: [
+        _buildStatTile('STATUS', _currentMedicine.currentStock > 0 ? 'AVAILABLE' : 'OUT OF STOCK', 
+                       _currentMedicine.currentStock > 0 ? Colors.green : Colors.red),
+        const SizedBox(width: 12),
+        _buildStatTile('STOCK', '${_currentMedicine.currentStock} UNITS', AppTheme.primaryBlue),
+      ],
+    ).animate().fadeIn(delay: 200.ms).slideX();
+  }
+
+  Widget _buildStatTile(String label, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color)),
+            const SizedBox(height: 4),
+            Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: color)),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget _buildInfoSection(String title, String content, HeroIcons icon, Color color) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              HeroIcon(icon, color: color, size: 24),
+              const SizedBox(width: 12),
+              Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            content,
+            style: TextStyle(fontSize: 15, color: Colors.grey[800], height: 1.5),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildStockSection(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildSectionTitle('Current Stock'),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: _currentMedicine.currentStock > 10 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
+  Widget _buildChemicalsSection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 10))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              HeroIcon(HeroIcons.fire, color: Colors.orange, size: 24),
+              const SizedBox(width: 12),
+              Text('Active Ingredients', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
           ),
-          child: Text(
-            '${_currentMedicine.currentStock} units',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: _currentMedicine.currentStock > 10 ? Colors.green : Colors.red,
-            ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _currentMedicine.chemicals.map((c) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withOpacity(0.2)),
+              ),
+              child: Text(
+                c,
+                style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+            )).toList(),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfessionalNotes() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryBlue.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.1)),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              HeroIcon(HeroIcons.academicCap, color: AppTheme.primaryBlue, size: 24),
+              const SizedBox(width: 12),
+              Text('Pharmacist Notes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Keep in a cool, dry place away from children. Monitor patient for allergic reactions especially if prescribed with other antibiotics.',
+            style: TextStyle(fontSize: 14, color: AppTheme.primaryBlue, fontStyle: FontStyle.italic),
+          ),
+        ],
+      ),
     );
   }
 
@@ -158,48 +303,57 @@ class _MedicineDetailViewState extends State<MedicineDetailView> {
     final TextEditingController quantityController = TextEditingController(text: '1');
     final inventoryController = Get.find<InventoryController>();
 
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sell Medicine'),
-        content: Column(
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Enter quantity for ${_currentMedicine.name}:'),
-            const SizedBox(height: 16),
+            const Text('Issue Medication', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('Enter amount to remove from stock for ${_currentMedicine.name}.', style: TextStyle(color: Colors.grey[600])),
+            const SizedBox(height: 24),
             TextField(
               controller: quantityController,
               keyboardType: TextInputType.number,
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Quantity',
-                border: OutlineInputBorder(),
+                prefixIcon: const Padding(padding: EdgeInsets.all(12), child: HeroIcon(HeroIcons.hashtag)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () async {
+                  final quantity = int.tryParse(quantityController.text) ?? 0;
+                  if (quantity <= 0) return;
+                  
+                  final success = await inventoryController.sellMedicine(_currentMedicine, quantity);
+                  if (success) {
+                    _refreshMedicine();
+                    Get.back();
+                    Get.snackbar('Success', 'Medication issued successfully', backgroundColor: Colors.green, colorText: Colors.white);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: const Text('CONFIRM TRANSACTION', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final quantity = int.tryParse(quantityController.text) ?? 0;
-              if (quantity <= 0) {
-                Get.snackbar('Invalid Quantity', 'Please enter a valid quantity');
-                return;
-              }
-              
-              final success = await inventoryController.sellMedicine(_currentMedicine, quantity);
-              if (success) {
-                _refreshMedicine();
-                if (mounted) Navigator.pop(context);
-              }
-            },
-            child: const Text('SELL'),
-          ),
-        ],
       ),
     );
   }
