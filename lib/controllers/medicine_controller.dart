@@ -1,12 +1,9 @@
 import 'package:get/get.dart';
-import 'package:dio/dio.dart';
 import '../models/medicine_model.dart';
 import '../services/db_service.dart';
-import '../core/constants.dart';
 
 class MedicineController extends GetxController {
   final DbService _dbService = Get.find<DbService>();
-  final Dio _dio = Dio();
 
   var medicines = <MedicineModel>[].obs;
   var isLoading = false.obs;
