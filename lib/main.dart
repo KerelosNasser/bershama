@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'services/db_service.dart';
 import 'services/ocr_service.dart';
 import 'services/ai_service.dart';
@@ -10,6 +11,9 @@ import 'core/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
 
   // Initialize Services
   await Get.putAsync(() => DbService().init());

@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AiService extends GetxService {
   final _dio = Dio(BaseOptions(
     baseUrl: 'https://openrouter.ai/api/v1',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer sk-or-v1-placeholder', // Replace with real key or move to env
+      'Authorization': 'Bearer ${dotenv.env['OPENROUTER_API_KEY']}',
     },
   ));
 
